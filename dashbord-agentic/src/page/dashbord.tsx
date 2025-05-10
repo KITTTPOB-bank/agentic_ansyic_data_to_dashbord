@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import Model from '../component/model';
+
 import { Chart, ChartConfiguration } from 'chart.js/auto';
-import { fetchByQuery, fetchByBody } from '../router/handler';
 const Dashboard: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [model, setModel] = useState<boolean>(false);
     const chartRef = useRef<HTMLCanvasElement>(null);
     const [chartData, setChartData] = useState<ChartConfiguration<'bar'>['data'] | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 
     useEffect(() => {
@@ -22,53 +25,56 @@ const Dashboard: React.FC = () => {
     }, [chartData]);
 
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setChartData({
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                datasets: [
-                    { label: 'Investment', data: [50, 120, 80, 90, 110, 200, 150], backgroundColor: 'rgba(66,153,225,0.6)' },
-                    { label: 'Loss', data: [20, 40, 30, 20, 50, 80, 60], backgroundColor: 'rgba(237,100,166,0.6)' },
-                    { label: 'Profit', data: [30, 60, 40, 50, 70, 120, 90], backgroundColor: 'rgba(156,163,175,0.6)' },
-                    { label: 'Maintenance', data: [10, 20, 10, 15, 25, 40, 30], backgroundColor: 'rgba(72,187,120,0.6)' },
-                ],
-            });
-        }, 2000);
-        return () => clearTimeout(timer);
-    }, []);
+    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.type === "text/csv") {
+                console.log("Selected CSV file: ", file.name);
+            } else {
+                console.log("Please upload a CSV file.");
+            }
+        }
+    };
+
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         setChartData({
+    //             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    //             datasets: [
+    //                 { label: 'Investment', data: [50, 120, 80, 90, 110, 200, 150], backgroundColor: 'rgba(66,153,225,0.6)' },
+    //                 { label: 'Loss', data: [20, 40, 30, 20, 50, 80, 60], backgroundColor: 'rgba(237,100,166,0.6)' },
+    //                 { label: 'Profit', data: [30, 60, 40, 50, 70, 120, 90], backgroundColor: 'rgba(156,163,175,0.6)' },
+    //                 { label: 'Maintenance', data: [10, 20, 10, 15, 25, 40, 30], backgroundColor: 'rgba(72,187,120,0.6)' },
+    //             ],
+    //         });
+    //     }, 2000);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     return (
         <div className="relative flex min-h-screen">
 
             {sidebarOpen && <div className="fixed inset-0 bg-black opacity-50 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />}
-
-            <aside className={`fixed inset-y-0 left-0 w-64 bg-white border-r transform z-30
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        transition-transform duration-200 ease-in-out
-        lg:translate-x-0 lg:static lg:inset-auto`}
+            <aside
+                className={`fixed inset-y-0 left-0 w-64 bg-white border-r transform z-30
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            transition-transform duration-200 ease-in-out
+            lg:translate-x-0 lg:static lg:inset-auto`}
             >
                 <div className="p-4 flex items-center space-x-2">
-                    <span className="text-xl font-bold">BERRY</span>
+                    <span className="text-xl font-bold">Menu</span>
                 </div>
                 <nav className="px-4">
                     <ul className="space-y-2 text-sm">
-                        <li className="font-semibold" onClick={async () => {
-                            const data = await fetchByQuery("hello");
-                            if (data) {
-                                console.log(data)
-                            }
-                        }}
-                        >Dashboard</li>
-                        <li className="text-gray-600 pl-3">Default</li>
-                        <li className="mt-4 font-semibold">Pages</li>
-                        <li className="text-gray-600 pl-3">Authentication</li>
-                        <li className="mt-4 font-semibold">Utilities</li>
-                        <li className="text-gray-600 pl-3">Typography</li>
-                        <li className="text-gray-600 pl-3">Color</li>
-                        <li className="text-gray-600 pl-3">Shadow</li>
-                        <li className="text-gray-600 pl-3">Icons</li>
-                        <li className="mt-4 font-semibold">Sample Page</li>
-                        <li className="text-gray-600 pl-3">Documentation</li>
+                        <label htmlFor="upload-csv">
+                            <button
+                                className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700"
+                                onClick={() => setModel(true)}
+                            >
+                                Get Start
+                            </button>
+                        </label>
+
                     </ul>
                 </nav>
             </aside>
@@ -139,6 +145,34 @@ const Dashboard: React.FC = () => {
                     </section>
                 </main>
             </div>
+            <Model show={model} onClose={() => setModel(false)}>
+                <h2 className="text-xl font-semibold mb-4 text-center">Get Start Your Project</h2>
+
+                <div className="space-y-4">
+                    <button
+                        className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        Upload File
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        id="upload-csv"
+                        type="file"
+                        accept=".csv"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                    />
+
+                    <button
+                        className="w-full py-2 px-4 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700"
+                        onClick={() => {}}
+                    >
+                        Process
+                    </button>
+                </div>
+            </Model>
+
         </div>
     );
 };

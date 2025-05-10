@@ -14,7 +14,7 @@ export async function fetchByQuery(test: string) {
   }
 }
 
-export async function fetchByBody(bodyParams: any) {
+export async function senddata(bodyParams: any) {
   try {
     const response = await fetch("http://localhost:8000/items", {
       method: "POST",
