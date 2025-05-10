@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
-
+import { fetchByQuery, fetchByBody } from '../router/handler';
 const Dashboard: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const chartRef = useRef<HTMLCanvasElement>(null);
@@ -11,31 +11,31 @@ const Dashboard: React.FC = () => {
         if (!chartRef.current || !chartData) return;
         const ctx = chartRef.current.getContext('2d');
         if (!ctx) return;
-      
-        const chart = new Chart(ctx, {
-          type: 'bar',
-          data: chartData,
-          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
-        });
-      
-        return () => chart.destroy();
-      }, [chartData]);
 
- 
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+        });
+
+        return () => chart.destroy();
+    }, [chartData]);
+
+
     useEffect(() => {
         const timer = setTimeout(() => {
-          setChartData({
-            labels:  ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
-            datasets: [
-                { label: 'Investment', data: [50,120,80,90,110,200,150], backgroundColor: 'rgba(66,153,225,0.6)' },
-                { label: 'Loss',       data: [20,40,30,20,50,80,60],      backgroundColor: 'rgba(237,100,166,0.6)' },
-                { label: 'Profit',     data: [30,60,40,50,70,120,90],     backgroundColor: 'rgba(156,163,175,0.6)' },
-                { label: 'Maintenance',data: [10,20,10,15,25,40,30],     backgroundColor: 'rgba(72,187,120,0.6)' },          
-          ],
-          });
-        }, 2000);  
+            setChartData({
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [
+                    { label: 'Investment', data: [50, 120, 80, 90, 110, 200, 150], backgroundColor: 'rgba(66,153,225,0.6)' },
+                    { label: 'Loss', data: [20, 40, 30, 20, 50, 80, 60], backgroundColor: 'rgba(237,100,166,0.6)' },
+                    { label: 'Profit', data: [30, 60, 40, 50, 70, 120, 90], backgroundColor: 'rgba(156,163,175,0.6)' },
+                    { label: 'Maintenance', data: [10, 20, 10, 15, 25, 40, 30], backgroundColor: 'rgba(72,187,120,0.6)' },
+                ],
+            });
+        }, 2000);
         return () => clearTimeout(timer);
-      }, []);
+    }, []);
 
     return (
         <div className="relative flex min-h-screen">
@@ -52,7 +52,13 @@ const Dashboard: React.FC = () => {
                 </div>
                 <nav className="px-4">
                     <ul className="space-y-2 text-sm">
-                        <li className="font-semibold">Dashboard</li>
+                        <li className="font-semibold" onClick={async () => {
+                            const data = await fetchByQuery("hello");
+                            if (data) {
+                                console.log(data)
+                            }
+                        }}
+                        >Dashboard</li>
                         <li className="text-gray-600 pl-3">Default</li>
                         <li className="mt-4 font-semibold">Pages</li>
                         <li className="text-gray-600 pl-3">Authentication</li>

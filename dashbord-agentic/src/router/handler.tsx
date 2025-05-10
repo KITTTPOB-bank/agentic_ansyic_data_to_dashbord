@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from "react";
-function Joke() {
-  const [joke, setJoke] = useState(null);
-  useEffect(() => {
-    fetch("https://jokes-by-api-ninjas.p.rapidapi.com/v1/jokes", {
-      method: "GET",
-      headers: {
-        "X-RapidAPI-Key": "your-api-key",
-        "X-RapidAPI-Host": "jokes-by-api-ninjas.p.rapidapi.com",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setJoke(data[0].joke);
-        console.log(data);
-      })
-      .catch((error) => console.log(error));
-  }, []);
-  return (
-    <div>
-      <h2>Joke of the day:</h2>
-      {joke && <p>{joke}</p>}
-    </div>
-  );
+// src/router/handler.tsx
+export async function fetchByQuery(test: string) {
+  try {
+    const response = await fetch(`http://localhost:8000/items/${test}`);
+    console.log("Raw response:", response);
+    
+    const data = await response.json();
+    console.log("Parsed JSON:", data);
+    
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return null;
+  }
 }
-export default Joke;
+
+export async function fetchByBody(bodyParams: any) {
+  try {
+    const response = await fetch("http://localhost:8000/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyParams),
+    });
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
