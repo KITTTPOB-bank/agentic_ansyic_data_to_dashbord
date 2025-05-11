@@ -1,41 +1,41 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import Model from '../component/model';
-
 import { Chart, ChartConfiguration } from 'chart.js/auto';
+import {sendCSVFile} from '../router/handler'
 const Dashboard: React.FC = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [model, setModel] = useState<boolean>(false);
     const chartRef = useRef<HTMLCanvasElement>(null);
     const [chartData, setChartData] = useState<ChartConfiguration<'bar'>['data'] | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
 
-    useEffect(() => {
-        if (!chartRef.current || !chartData) return;
-        const ctx = chartRef.current.getContext('2d');
-        if (!ctx) return;
+    // useEffect(() => {
+    //     if (!chartRef.current || !chartData) return;
+    //     const ctx = chartRef.current.getContext('2d');
+    //     if (!ctx) return;
 
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
-        });
+    //     const chart = new Chart(ctx, {
+    //         type: 'bar',
+    //         data: chartData,
+    //         options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+    //     });
 
-        return () => chart.destroy();
-    }, [chartData]);
+    //     return () => chart.destroy();
+    // }, [chartData]);
 
-
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            if (file.type === "text/csv") {
-                console.log("Selected CSV file: ", file.name);
-            } else {
-                console.log("Please upload a CSV file.");
-            }
+        if (file && file.type === "text/csv") {
+            const result = await sendCSVFile(file);
+            console.log(result)
+            console.log("CSV file ready:", file.name);
+        } else {
+            console.log("Please upload a valid CSV file.");
         }
     };
-
+    
     // useEffect(() => {
     //     const timer = setTimeout(() => {
     //         setChartData({
@@ -124,12 +124,10 @@ const Dashboard: React.FC = () => {
                                     </div>
                                     <p className="font-bold">$1839.00</p>
                                 </div>
-                                {/* more items */}
                             </div>
                         </div>
                     </section>
 
-                    {/* 3. Notifications */}
                     <section className="bg-white shadow rounded p-6">
                         <h3 className="text-lg font-semibold mb-4">Notifications</h3>
                         <ul className="space-y-3">
@@ -140,7 +138,6 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 <span className="text-gray-400">Just now</span>
                             </li>
-                            {/* more notifications */}
                         </ul>
                     </section>
                 </main>
@@ -155,6 +152,7 @@ const Dashboard: React.FC = () => {
                     >
                         Upload File
                     </button>
+
                     <input
                         ref={fileInputRef}
                         id="upload-csv"

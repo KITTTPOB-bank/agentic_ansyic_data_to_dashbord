@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from model import stucter
 from fastapi import FastAPI
 from handler import create_db
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+
 app = FastAPI()
 
 app.add_middleware(
@@ -15,13 +18,13 @@ app.add_middleware(
 
 
 
-@app.post("/read")
-async def read_item(data: stucter.ReadFile):
-    print(data)
-    process = await create_db.read_csv(data)
-    return {"sussess": process}
-
-
+@app.post("/items")
+async def read_item(file: UploadFile = File(...)):
+    print("Received file:", file)
+    
+    # process = await create_db.read_csv(file)
+    
+    return JSONResponse(content={"success": "process"})
 
 @app.post("/process")
 async def anysic():

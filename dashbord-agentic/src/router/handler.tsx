@@ -1,4 +1,5 @@
 // src/router/handler.tsx
+
 export async function fetchByQuery(test: string) {
   try {
     const response = await fetch(`http://localhost:8000/items/${test}`);
@@ -14,18 +15,21 @@ export async function fetchByQuery(test: string) {
   }
 }
 
-export async function senddata(bodyParams: any) {
+export async function sendCSVFile(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
   try {
     const response = await fetch("http://localhost:8000/items", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bodyParams),
+      body: formData,
     });
+
     const data = await response.json();
     console.log(data);
     return data;
   } catch (error) {
-    console.error(error);
+    console.error("Error uploading CSV:", error);
     return null;
   }
 }
